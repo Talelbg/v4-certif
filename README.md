@@ -200,7 +200,14 @@ npm run test:coverage
 ├── __tests__/              # Test files
 ├── .github/workflows/      # GitHub Actions CI
 ├── components/             # React components
-├── contexts/               # React contexts (AuthContext)
+│   ├── LoginPage.tsx       # Authentication UI
+│   ├── ProtectedRoute.tsx  # Route protection wrapper
+│   ├── UserMenu.tsx        # User dropdown menu
+│   └── ...                 # Other components
+├── contexts/               # React contexts
+│   └── AuthContext.tsx     # Authentication context
+├── hooks/                  # Custom React hooks
+│   └── useFirebaseData.ts  # Real-time Firestore sync
 ├── services/               # Firebase services
 │   ├── firestoreService.ts # Firestore CRUD operations
 │   ├── storageService.ts   # Cloud Storage operations
@@ -211,6 +218,9 @@ npm run test:coverage
 ├── types.ts                # TypeScript type definitions
 ├── App.tsx                 # Main application component
 ├── index.tsx               # Application entry point
+├── Dockerfile              # Docker container config
+├── docker-compose.yml      # Docker Compose config
+├── nginx.conf              # Nginx server config
 └── vite.config.ts          # Vite configuration
 ```
 
@@ -259,12 +269,70 @@ firebase deploy
 
 ### Docker
 
-A Dockerfile is included for containerized deployment:
+A Dockerfile and docker-compose.yml are included for containerized deployment.
+
+#### Build and Run with Docker
 
 ```bash
+# Build the image
 docker build -t hedera-certif-dashboard .
-docker run -p 80:80 hedera-certif-dashboard
+
+# Run the container
+docker run -p 3000:80 hedera-certif-dashboard
 ```
+
+#### Build with Environment Variables
+
+```bash
+# Build with custom Firebase config
+docker build \
+  --build-arg VITE_FIREBASE_API_KEY=your-api-key \
+  --build-arg VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com \
+  --build-arg VITE_FIREBASE_PROJECT_ID=your-project-id \
+  --build-arg VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app \
+  --build-arg VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id \
+  --build-arg VITE_FIREBASE_APP_ID=your-app-id \
+  --build-arg VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX \
+  -t hedera-certif-dashboard .
+```
+
+#### Using Docker Compose
+
+```bash
+# Production build and run
+docker-compose up -d app
+
+# Development with hot reload
+docker-compose --profile dev up dev
+
+# Stop all services
+docker-compose down
+```
+
+#### Docker Compose with .env file
+
+Create a `.env` file in the project root:
+
+```env
+VITE_FIREBASE_API_KEY=your-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+VITE_FIREBASE_MEASUREMENT_ID=G-XXXXXXXXXX
+GEMINI_API_KEY=your-gemini-api-key
+```
+
+Then run:
+
+```bash
+docker-compose up -d
+```
+
+### Health Check
+
+The Docker container includes a health check endpoint at `/health` that returns `200 OK` when the application is running.
 
 ## Contributing
 
