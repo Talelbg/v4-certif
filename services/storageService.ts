@@ -186,7 +186,9 @@ export function uploadFileWithProgress(
       uploadTask.on(
         'state_changed',
         (snapshot: UploadTaskSnapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          const progress = snapshot.totalBytes > 0 
+            ? (snapshot.bytesTransferred / snapshot.totalBytes) * 100 
+            : 0;
           onProgress({
             bytesTransferred: snapshot.bytesTransferred,
             totalBytes: snapshot.totalBytes,

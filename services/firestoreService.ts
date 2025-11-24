@@ -97,8 +97,8 @@ export async function addDocument<T extends DocumentData>(
   data: Omit<T, 'id'>
 ): Promise<string> {
   try {
-    // Validate data is not empty
-    if (!data || Object.keys(data).length === 0) {
+    // Validate data is not empty object
+    if (!data || (typeof data === 'object' && Object.keys(data).length === 0)) {
       throw new Error('Document data cannot be empty');
     }
 

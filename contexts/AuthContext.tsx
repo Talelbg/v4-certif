@@ -155,8 +155,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await updateUserProfile(currentUser, data);
       // Force refresh the user to get updated data
+      // onAuthStateChanged will handle the state update automatically
       await currentUser.reload();
-      setCurrentUser({ ...currentUser });
     } catch (err) {
       handleAuthError(err);
     }
